@@ -8,13 +8,13 @@
   :root {
     --bg: #f6f5f1; --panel: #ffffff; --ink: #1c1c1a; --muted: #67655f; --line: #d9d6cd;
     --input: #fff7c2; --input-ink: #1a3fbf; --check: #fbe3d3; --check-ink: #b4500a;
-    --head: #e6ebf5; --word: #e3f0dc; --good: #2b7a2f; --bad: #c0312b; --accent: #b4500a; --group: #6b6860;
+    --head: #e6ebf5; --word: #e3f0dc; --good: #2b7a2f; --bad: #c0312b; --warn-bg: #fdecea; --accent: #b4500a; --group: #6b6860;
   }
   @media (prefers-color-scheme: dark) {
     :root:not([data-theme="light"]) {
       --bg: #151513; --panel: #1f1f1c; --ink: #ecebe6; --muted: #a09d94; --line: #3a3933;
       --input: #3b3518; --input-ink: #9db6ff; --check: #45291a; --check-ink: #f3a065;
-      --head: #262c38; --word: #22301d; --good: #6cc070; --bad: #f06a62; --accent: #f3a065; --group: #8c897f;
+      --head: #262c38; --word: #22301d; --good: #6cc070; --bad: #f06a62; --warn-bg: #3a1c1a; --accent: #f3a065; --group: #8c897f;
     }
   }
   * { box-sizing: border-box; }
@@ -58,22 +58,61 @@
   .phrase div { background: var(--word); border-radius: 8px; padding: 8px 10px; font-weight: 700; }
   .phrase span { color: var(--muted); font-weight: 400; margin-right: 6px; }
   .note { font-size: .85rem; color: var(--muted); }
+  .warn { background: var(--warn-bg); border: 2px solid var(--bad); border-radius: 12px; padding: 16px 18px; margin-bottom: 18px; }
+  .warn h2 { color: var(--bad); margin: 0 0 8px; font-size: 1.2rem; }
+  .warn ul { margin: 0; padding-left: 20px; }
+  .warn li { margin: 6px 0; }
+  .titlepage { background: var(--panel); border: 1px solid var(--line); border-radius: 12px; padding: 28px 18px 18px; margin-bottom: 18px; text-align: center; }
+  .tp-title { font-weight: 800; font-size: 1.45rem; margin: 0 0 16px; }
+  .tp-fields { display: flex; flex-direction: column; align-items: center; gap: 4px; }
+  input.tp { width: min(520px, 100%); text-align: center; font: inherit; border: 0; border-bottom: 1px dashed var(--line); background: transparent; color: var(--ink); padding: 4px 6px; }
+  input.tp:focus { outline: none; border-bottom-color: var(--accent); }
+  input.tp[readonly] { border-bottom-color: transparent; }
+  input.tp#name { background: var(--input); border-radius: 6px; font-weight: 700; }
+  .about h2 { margin-bottom: 4px; }
+  .about p { margin: 8px 0; }
+  .why { background: var(--head); border-radius: 8px; padding: 10px 12px; margin: 6px 0 12px; font-size: .9rem; }
+  h3.way { font-size: 1rem; margin: 18px 0 4px; }
+  footer p { margin: 6px 0; }
   .hidden { display: none !important; }
 </style>
 </head>
 <body>
 <main>
-  <h1>Seed Phrase Worksheet</h1>
+  <header class="titlepage" aria-label="Title page">
+    <p class="tp-title" id="tpTitle"></p>
+    <div class="tp-fields">
+      <input class="tp" id="name" autocomplete="name" placeholder="Your first and last name" aria-label="Your name">
+      <input class="tp" id="dept" autocomplete="off" placeholder="Department" aria-label="Department">
+      <input class="tp" id="univ" autocomplete="off" placeholder="University" aria-label="University">
+      <input class="tp" id="course" autocomplete="off" placeholder="Course number: Course name" aria-label="Course">
+      <input class="tp" id="instructor" autocomplete="off" placeholder="Instructor" aria-label="Instructor">
+      <input class="tp" id="duedate" autocomplete="off" placeholder="Date" aria-label="Date">
+    </div>
+    <p class="note" style="text-align:center;margin:10px 0 0">Type your name on the first line. The title block follows APA 7th edition and goes on the first page of the file you hand in.</p>
+  </header>
+
   <p class="sub">Roll dice, turn them into 256 bits, find the checksum, and turn your bits into 24 words, one step at a time. At the end, download your work as an Excel file and hand it in.</p>
 
-  <section>
-    <label class="name"><strong>Your name:</strong> <input class="text" id="name" autocomplete="name" placeholder="First and last name"></label>
-    <label class="name" style="margin-top:8px"><strong>Class / period:</strong> <input class="text" id="klass" autocomplete="off" placeholder="e.g. Econ, 3rd period"></label>
+  <section class="about">
+    <h2>About this exercise</h2>
+    <p class="small"><strong>This is a learning exercise only.</strong> The seed phrase you make here is <strong>not</strong> for holding (self-custody of) real bitcoin. This page runs in a web browser on a computer that is connected to the internet, and anything typed on an online computer could be seen by malware or other software.</p>
+    <p class="small">Real keys can be made completely offline: on a computer that has never been connected to the internet, or entirely by hand with dice, pencil, paper and the same math you'll do here.</p>
+    <p class="small">The point of this exercise is to walk you through, step by step, <strong>what a hardware wallet or wallet software does inside</strong> when it creates your keys. A wallet does all of this in a fraction of a second. Here you do it slowly enough to see every step: randomness → bits → checksum → numbers → words.</p>
+  </section>
+
+  <section class="warn" role="note" aria-label="Warning">
+    <h2>⚠ Read this first</h2>
+    <ul>
+      <li><strong>Never share your 24 words.</strong> Anyone who has your words owns the bitcoin, with no way to get it back. No real company, wallet, exchange or support person will ever ask for them.</li>
+      <li><strong>Use real dice. Don't make up your bits.</strong> People are bad at being random. Bits you pick in your head, patterns (like 0101…), or all 0s or all 1s make words that thieves can guess. Thieves run programs that constantly check weak, guessable keys and empty any bitcoin they find.</li>
+    </ul>
     <p class="note" id="listStatus" style="margin:10px 0 0">Checking the word list…</p>
   </section>
 
   <section>
     <h2><span class="step">Step 1</span>Roll your dice and type your bits</h2>
+    <div class="why"><strong>What's happening:</strong> every Bitcoin key starts as a big random number. A wallet gets its randomness from a hardware random number generator inside its chip; you'll get yours from dice, which you can see. Each bit is a coin-flip choice (0 or 1), and 256 of them give 2<sup>256</sup> possible keys, a 78-digit number, close to the estimated number of atoms in the observable universe. That's why nobody can guess a truly random key, and why made-up or patterned bits are dangerous.</div>
     <p class="small">Read your dice left to right: <strong>1, 2 or 3 = 0</strong> &nbsp;·&nbsp; <strong>4, 5 or 6 = 1</strong>. Type one bit per yellow box: 11 per row for rows 1–23, then 3 in row 24. Each row is split 4 – 4 – 3 to help you keep your place. The orange boxes are the checksum. You'll get them in Step 2.</p>
     <p class="note">Tip: the cursor jumps to the next box by itself. You can also paste a string of 0s and 1s into any box.</p>
     <div class="scroll"><table class="grid" id="bitGrid"></table></div>
@@ -82,35 +121,47 @@
 
   <section>
     <h2><span class="step">Step 2</span>Find the checksum</h2>
+    <div class="why"><strong>What's happening:</strong> your 256 bits get run through <strong>SHA-256</strong>, a "hash" function. It always gives the same 64-character answer for the same input, but change even one bit and the answer changes completely, and there's no way to work backward from the answer to the input. The BIP-39 standard takes the <strong>first 8 bits</strong> of that hash (the first two hex characters) and adds them to the end of your bits. That's the <strong>checksum</strong>: if someone later writes down a wrong word, the checksum won't match and the wallet will warn them. 256 + 8 = 264 bits, which divides evenly into 24 groups of 11.</div>
     <p class="small">Your 256 bits as one string:</p>
     <div class="box" id="bitString">(finish Step 1 first)</div>
-    <p class="small" style="margin-top:14px">The command to paste into Terminal:</p>
+
+    <h3 class="way">Way A: with Terminal</h3>
+    <p class="small">The command to paste into Terminal:</p>
     <div class="box" id="command">(finish Step 1 first)</div>
     <div class="row"><button id="copyCmd" disabled>Copy command</button><span class="note" id="copied"></span></div>
     <ol class="how small">
       <li>Open <strong>Terminal</strong> (Mac), or the <strong>Ubuntu</strong> app (Windows).</li>
       <li>Paste the command and press Return. You get a 64-character hash.</li>
-      <li>Type its <strong>first two characters</strong> here:</li>
     </ol>
+    <p class="note">Keep the <span class="mono">-0</span> at the end of the command. It makes shasum read your 0s and 1s as bits instead of as text.</p>
+
+    <h3 class="way">Way B: no Terminal? Let this page work out the hash</h3>
+    <p class="small">This page has SHA-256 built in. It does exactly the same math as the Terminal command.</p>
+    <div class="row"><button id="showHash" disabled>Show my SHA-256 hash</button></div>
+    <div class="box hidden" id="pageHash"></div>
+
+    <p class="small" style="margin-top:16px"><strong>Either way:</strong> type the <strong>first two characters</strong> of your hash here:</p>
     <div class="row">
       <input class="hex" id="hex" maxlength="2" autocomplete="off" spellcheck="false" placeholder="??">
-      <span class="note">Keep the <span class="mono">-0</span> at the end of the command. It makes shasum read your 0s and 1s as bits.</span>
     </div>
     <div id="hexWork" class="hidden">
       <div class="row"><span class="small">1st character:</span> <span class="conv" id="c1"></span></div>
       <div class="row"><span class="small">2nd character:</span> <span class="conv" id="c2"></span></div>
       <div class="row"><span class="small">8 checksum bits (they finish row 24):</span> <span class="conv" id="c8"></span></div>
+      <p class="note">Each hex character is 4 bits: 0 = 0000, 1 = 0001 … 9 = 1001, a = 1010, b = 1011, c = 1100, d = 1101, e = 1110, f = 1111.</p>
     </div>
     <div class="status" id="hexStatus"></div>
   </section>
 
   <section>
     <h2><span class="step">Step 3</span>Turn your bits into words</h2>
+    <div class="why"><strong>What's happening:</strong> 11 bits can make 2<sup>11</sup> = 2048 different numbers, from 0 to 2047, and the BIP-39 word list has exactly 2048 words. So each group of 11 bits picks one word. Reading a group of bits as a number works like reading a regular number, only each place is worth double the one to its right instead of ten times: 1, 2, 4, 8 … 1024. The words don't add anything new. They're just an easier way for people to write down and read back the same 264 bits without mistakes.</div>
     <p class="small">Add up the place values that have a 1 under them = <strong>M</strong>. The word list starts at line 1, but the numbers start at 0, so add 1 = <strong>N</strong>. Line N of the BIP-39 word list is your word.</p>
     <div class="scroll"><table class="grid" id="wordGrid"></table></div>
     <h2 style="margin-top:18px">Your 24 words</h2>
     <div class="phrase" id="phrase"></div>
     <p class="note" id="phraseNote">Your words appear here as each row is finished.</p>
+    <div class="why" style="margin-top:14px"><strong>What a wallet does next:</strong> it runs your 24 words (plus an optional extra passphrase) through a function called PBKDF2, 2048 rounds of HMAC-SHA512, to make a 512-bit "seed." From that seed it builds a master private key (BIP-32), and from the master key it makes all your addresses. Those steps are too long to do by hand, but they're the same every time, so the same 24 words always lead back to the same bitcoin.</div>
   </section>
 
   <section>
@@ -119,11 +170,23 @@
     <div class="row"><button class="primary" id="download">Download my work (Excel)</button><span class="note" id="dlNote"></span></div>
   </section>
 
-  <p class="note">Everything happens inside this page. Nothing you type is saved or sent anywhere, and it works without internet. <strong>Practice only:</strong> real keys are made on an air-gapped computer that has never been online.</p>
+  <footer class="note">
+    <p>Everything happens inside this page. Nothing you type is saved or sent anywhere, and once loaded it works without internet.</p>
+    <p><strong>Free and open-source software</strong>, MIT License. Built on the BIP-39 standard and its official English word list (github.com/bitcoin/bips, bip-0039), and follows the steps in Bitcoin Magazine's "DIY Bitcoin private key project."</p>
+  </footer>
 </main>
 
 <script>
 "use strict";
+/* ============ COURSE SETTINGS: fill these in once; every student sees them. Leave "" to let students type it. ============ */
+const COURSE = {
+  title:      "Making a Bitcoin Seed Phrase by Hand: From Dice to 24 Words",
+  department: "",
+  university: "",
+  course:     "",      // e.g. "ECON 650: Monetary Economics"
+  instructor: "",      // e.g. "Dr. First Last"
+};
+/* ==================================================================================================================== */
 const WORDLIST_TEXT = `abandon ability able about above absent absorb abstract absurd abuse access accident account accuse achieve acid
 acoustic acquire across act action actor actress actual adapt add addict address adjust admit adult advance
 advice aerobic affair afford afraid again age agent agree ahead aim air airport aisle alarm album
@@ -425,6 +488,8 @@ function update() {
   $("bitString").textContent = s.complete ? s.str : "(finish Step 1 first)";
   $("command").textContent = s.complete ? `echo ${s.str} | shasum -a 256 -0` : "(finish Step 1 first)";
   $("copyCmd").disabled = !s.complete;
+  $("showHash").disabled = !s.complete;
+  if (!s.complete) { $("pageHash").classList.add("hidden"); $("pageHash").textContent = ""; hashShown = false; }
   if (s.typedOk) {
     $("hexWork").classList.remove("hidden");
     $("c1").textContent = `${s.typed[0]}  →  ${s.cs8.slice(0, 4)}`;
@@ -436,7 +501,7 @@ function update() {
   else if (!s.typed) hs = '<span class="muted">Type the first two characters of your hash.</span>';
   else if (!s.typedOk) hs = '<span class="bad">Use two characters, each 0–9 or a–f.</span>';
   else if (s.correct) hs = '<span class="ok">✓ Correct, your checksum is right. Go to Step 3.</span>';
-  else hs = '<span class="bad">✗ Not right. Check the whole command was copied, including -0 at the end.</span>';
+  else hs = '<span class="bad">✗ Not right. Check you typed the first two characters of the hash. In Terminal, make sure the whole command was copied, including -0 at the end.</span>';
   $("hexStatus").innerHTML = hs;
   // Step 3
   const words = [];
@@ -514,16 +579,21 @@ function buildXlsx() {
   const B = v => ({ v, b: true });
   const now = new Date();
   const summary = [
-    [B("Seed Phrase Worksheet")], [],
-    [B("Name"), name || "(no name entered)"],
-    [B("Class / period"), $("klass").value.trim() || ""],
-    [B("Date"), now.toLocaleString()],
+    [B(COURSE.title)], [],
+    [B("Student"), name || "(no name entered)"],
+    [B("Department"), $("dept").value.trim()],
+    [B("University"), $("univ").value.trim()],
+    [B("Course"), $("course").value.trim()],
+    [B("Instructor"), $("instructor").value.trim()],
+    [B("Date"), $("duedate").value.trim()],
+    [B("Downloaded"), now.toLocaleString()],
+    [B("How the hash was found"), hashShown ? "This page's built-in SHA-256 (Way B)" : "Terminal (Way A)"],
     [B("Bits entered"), `${s.filled} of 256`],
     [B("Checksum typed"), s.typed || "(none)"],
     [B("Checksum correct?"), !s.complete ? "Not finished" : (s.correct ? "YES" : "NO")],
     [], [B("24 words")],
     ...words.map((w, i) => [i + 1, w || "(not finished)"]),
-    [], ["Practice only. Real keys are made on an air-gapped computer that has never been online."],
+    [], ["Learning exercise only. Not for self-custody of real bitcoin: this was made on a computer connected to the internet."],
   ];
   const sheet1 = [[B("Row"), ...PLACE.map(B), B("Row digits")]];
   s.rows.forEach((row, r) => {
@@ -535,6 +605,7 @@ function buildXlsx() {
     [B("Step 2: the checksum")], [],
     [B("256 bits as one string"), s.complete ? s.str : "(not finished)"],
     [B("Terminal command"), s.complete ? `echo ${s.str} | shasum -a 256 -0` : "(not finished)"],
+    [B("Hash found with"), hashShown ? "This page's built-in SHA-256 (Way B)" : "Terminal (Way A)"],
     [B("First two characters typed"), s.typed || "(none)"],
     [B("1st character as 4 bits"), s.typedOk ? `${s.typed[0]} -> ${s.cs8.slice(0, 4)}` : ""],
     [B("2nd character as 4 bits"), s.typedOk ? `${s.typed[1]} -> ${s.cs8.slice(4)}` : ""],
@@ -587,7 +658,22 @@ $("copyCmd").addEventListener("click", async () => {
 $("hex").addEventListener("input", e => { e.target.value = e.target.value.replace(/\s/g, "").toLowerCase(); update(); });
 window.addEventListener("beforeunload", e => { if (entropyInputs.some(i => i.value)) { e.preventDefault(); e.returnValue = ""; } });
 
-buildBitGrid(); buildWordGrid(); loadWords(); update();
+let hashShown = false;
+$("showHash").addEventListener("click", () => {
+  const s = readState(); if (!s.complete) return;
+  const h = toHex(sha256(bitsToBytes(s.str)));
+  $("pageHash").innerHTML = `<strong>${h.slice(0, 2)}</strong>${h.slice(2)}`;
+  $("pageHash").classList.remove("hidden"); hashShown = true;
+});
+function setupTitlePage() {
+  $("tpTitle").textContent = COURSE.title;
+  document.title = COURSE.title;
+  for (const [id, key] of [["dept", "department"], ["univ", "university"], ["course", "course"], ["instructor", "instructor"]]) {
+    if (COURSE[key]) { $(id).value = COURSE[key]; $(id).readOnly = true; }
+  }
+  $("duedate").value = new Date().toLocaleDateString(undefined, { year: "numeric", month: "long", day: "numeric" });
+}
+setupTitlePage(); buildBitGrid(); buildWordGrid(); loadWords(); update();
 window.__buildXlsx = buildXlsx;   // used by tests
 </script>
 </body>
